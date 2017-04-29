@@ -10,11 +10,10 @@ import UIKit
 
 protocol CenterViewControllerDelegate {
   func toggleLeftPanel()
-  func toggleRightPanel()
   func collapseSidePanels()
 }
 
-class CenterViewController: UIViewController {
+class CenterViewController: UIViewController, SidePanelViewControllerDelegate {
   
   @IBOutlet weak fileprivate var imageView: UIImageView!
   @IBOutlet weak fileprivate var titleLabel: UILabel!
@@ -28,13 +27,6 @@ class CenterViewController: UIViewController {
     delegate?.toggleLeftPanel()
   }
   
-  @IBAction func puppiesTapped(_ sender: AnyObject) {
-    delegate?.toggleRightPanel()
-  }
-  
-}
-
-extension CenterViewController: SidePanelViewControllerDelegate {
   func animalSelected(_ animal: Animal) {
     imageView.image = animal.image
     titleLabel.text = animal.title
@@ -42,4 +34,5 @@ extension CenterViewController: SidePanelViewControllerDelegate {
     
     delegate?.collapseSidePanels()
   }
+  
 }

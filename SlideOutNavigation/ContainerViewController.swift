@@ -3,7 +3,7 @@
 //  SlideOutNavigation
 //
 //  Created by James Frost on 03/08/2014.
-//  Copyright (c) 2014 James Frost. All rights reserved.
+//  Copyright (c) 2014 James Frost. All s reserved.
 //
 
 import UIKit
@@ -12,7 +12,6 @@ import QuartzCore
 enum SlideOutState {
   case bothCollapsed
   case leftPanelExpanded
-  case rightPanelExpanded
 }
 
 class ContainerViewController: UIViewController {
@@ -28,7 +27,6 @@ class ContainerViewController: UIViewController {
   }
   
   var leftViewController: SidePanelViewController?
-  var rightViewController: SidePanelViewController?
 
   let centerPanelExpandedOffset: CGFloat = 60
   
@@ -65,21 +63,9 @@ extension ContainerViewController: CenterViewControllerDelegate {
     
     animateLeftPanel(shouldExpand: notAlreadyExpanded)
   }
-  
-  func toggleRightPanel() {
-    let notAlreadyExpanded = (currentState != .rightPanelExpanded)
     
-    if notAlreadyExpanded {
-      addRightPanelViewController()
-    }
-    
-    animateRightPanel(shouldExpand: notAlreadyExpanded)
-  }
-  
   func collapseSidePanels() {
-    switch (currentState) {
-    case .rightPanelExpanded:
-      toggleRightPanel()
+    switch (currentState) {   
     case .leftPanelExpanded:
       toggleLeftPanel()
     default:
@@ -91,8 +77,9 @@ extension ContainerViewController: CenterViewControllerDelegate {
     if (leftViewController == nil) {
       leftViewController = UIStoryboard.leftViewController()
       leftViewController!.animals = Animal.allCats()
-      
-      addChildSidePanelController(leftViewController!)
+      centerNavigationController = UINavigationController(rootViewController: leftViewController!)
+      view.addSubview(centerNavigationController.view)
+//      addChildSidePanelController(leftViewController!)
     }
   }
   
@@ -103,15 +90,6 @@ extension ContainerViewController: CenterViewControllerDelegate {
     
     addChildViewController(sidePanelController)
     sidePanelController.didMove(toParentViewController: self)
-  }
-  
-  func addRightPanelViewController() {
-    if (rightViewController == nil) {
-      rightViewController = UIStoryboard.rightViewController()
-      rightViewController!.animals = Animal.allDogs()
-      
-      addChildSidePanelController(rightViewController!)
-    }
   }
   
     func animateLeftPanel(shouldExpand: Bool) {
@@ -134,22 +112,7 @@ extension ContainerViewController: CenterViewControllerDelegate {
       self.centerNavigationController.view.frame.origin.x = targetPosition
       }, completion: completion)
   }
-  
-  func animateRightPanel(shouldExpand: Bool) {
-    if (shouldExpand) {
-      currentState = .rightPanelExpanded
-      
-      animateCenterPanelXPosition(targetPosition: -(centerNavigationController.view.frame).width + centerPanelExpandedOffset)
-    } else {
-      animateCenterPanelXPosition(targetPosition: 0) { _ in
-        self.currentState = .bothCollapsed
-        
-        self.rightViewController!.view.removeFromSuperview()
-        self.rightViewController = nil;
-      }
-    }
-  }
-  
+    
   func showShadowForCenterViewController(_ shouldShowShadow: Bool) {
     if (shouldShowShadow) {
       centerNavigationController.view.layer.shadowOpacity = 0.8
@@ -171,8 +134,6 @@ extension ContainerViewController: UIGestureRecognizerDelegate {
       if (currentState == .bothCollapsed) {
         if (gestureIsDraggingFromLeftToRight) {
           addLeftPanelViewController()
-        } else {
-          addRightPanelViewController()
         }
         
         showShadowForCenterViewController(true)
@@ -185,9 +146,6 @@ extension ContainerViewController: UIGestureRecognizerDelegate {
         // animate the side panel open or closed based on whether the view has moved more or less than halfway
         let hasMovedGreaterThanHalfway = recognizer.view!.center.x > view.bounds.size.width
         animateLeftPanel(shouldExpand: hasMovedGreaterThanHalfway)
-      } else if (rightViewController != nil) {
-        let hasMovedGreaterThanHalfway = recognizer.view!.center.x < 0
-        animateRightPanel(shouldExpand: hasMovedGreaterThanHalfway)
       }
     default:
       break
@@ -196,16 +154,14 @@ extension ContainerViewController: UIGestureRecognizerDelegate {
 }
 
 private extension UIStoryboard {
-  class func mainStoryboard() -> UIStoryboard { return UIStoryboard(name: "Main", bundle: Bundle.main) }
+  class func mainStoryboard() -> UIStoryboard {
+    return UIStoryboard(name: "Main", bundle: Bundle.main)
+  }
   
   class func leftViewController() -> SidePanelViewController? {
     return mainStoryboard().instantiateViewController(withIdentifier: "LeftViewController") as? SidePanelViewController
   }
-  
-  class func rightViewController() -> SidePanelViewController? {
-    return mainStoryboard().instantiateViewController(withIdentifier: "RightViewController") as? SidePanelViewController
-  }
-  
+
   class func centerViewController() -> CenterViewController? {
     return mainStoryboard().instantiateViewController(withIdentifier: "CenterViewController") as? CenterViewController
   }
