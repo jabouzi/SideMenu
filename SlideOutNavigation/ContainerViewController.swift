@@ -61,7 +61,7 @@ extension ContainerViewController: CenterViewControllerDelegate {
       addLeftPanelViewController()
     }
     
-    animateLeftPanel(shouldExpand: notAlreadyExpanded)
+//    animateLeftPanel(shouldExpand: notAlreadyExpanded)
   }
     
   func collapseSidePanels() {
@@ -78,6 +78,11 @@ extension ContainerViewController: CenterViewControllerDelegate {
       leftViewController = UIStoryboard.leftViewController()
       leftViewController!.animals = Animal.allCats()
       centerNavigationController = UINavigationController(rootViewController: leftViewController!)
+      let screenSize: CGRect = UIScreen.main.bounds
+//      centerNavigationController?.view.frame =  CGRect(x:0, y: 0, width: 50, height: screenSize.height * 0.2)
+//      let viewsOriginalTransform: CGAffineTransform  = view.transform
+//      centerNavigationController?.view.transform = viewsOriginalTransform.scaledBy(x: 0.5, y: 1.0);
+      centerNavigationController?.view.frame.size.width = screenSize.height * 0.2
       view.addSubview(centerNavigationController.view)
 //      addChildSidePanelController(leftViewController!)
     }
